@@ -1,0 +1,79 @@
+version: '3.9'
+
+# ╔══════════════════════════════════════════════════════════════════╗
+# ║  Requires: .env file with all variables filled                  ║
+# ║  Copy .env.example → .env and fill values before running       ║
+# ╚══════════════════════════════════════════════════════════════════╝
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: thara_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - thara_net
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: thara_backend
+    restart: unless-stopped
+    # Port NOT exposed to host — nginx proxies internally
+    expose:
+      - "4000"
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
+      JWT_SECRET: ${JWT_SECRET}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:3000}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      ADMIN_NAME: ${ADMIN_NAME:-Thara Admin}
+      EMAIL_USER: ${EMAIL_USER:-}
+      EMAIL_PASS: ${EMAIL_PASS:-}
+      EMAIL_FROM: ${EMAIL_FROM:-}
+      EMAIL_HOST: ${EMAIL_HOST:-}
+      EMAIL_PORT: ${EMAIL_PORT:-587}
+      EMAIL_SECURE: ${EMAIL_SECURE:-false}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - thara_net
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: /api
+        VITE_SOCKET_URL: ""
+        # VITE_ADMIN_PASSWORD removed — never embed admin secrets in frontend bundle
+    container_name: thara_frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - thara_net
+
+volumes:
+  postgres_data:
+
+networks:
+  thara_net:
+    driver: bridge

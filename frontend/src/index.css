@@ -1,0 +1,197 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&family=Tajawal:wght@700;800;900&family=Amiri:wght@700&display=swap');
+@import "tailwindcss";
+
+@keyframes ken-burns {
+  0% { transform: scale(1) translate(0, 0); }
+  50% { transform: scale(1.1) translate(-1%, -1%); }
+  100% { transform: scale(1) translate(0, 0); }
+}
+
+@keyframes scroll-background {
+  0% { background-position: 0% center; }
+  100% { background-position: 100% center; }
+}
+
+.animate-ken-burns {
+  animation: ken-burns 20s ease-in-out infinite;
+}
+
+.scrolling-cityscape {
+  background-size: 3000px auto;
+  animation: scroll-background 30s linear infinite;
+}
+
+.vertical-text {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+}
+
+@theme {
+  --font-sans: "Outfit", "Cairo", ui-sans-serif, system-ui, sans-serif;
+  --font-arabic: "Tajawal", "Cairo", sans-serif;
+  --font-tajawal: "Tajawal", sans-serif;
+  --font-amiri: "Amiri", serif;
+  --font-display: "Playfair Display", serif;
+  
+  --color-brand-green-950: #020e0d;
+  --color-brand-green-900: #042f2e;
+  --color-brand-green-800: #064e3b;
+  --color-brand-gold-500: #c5a059;
+  --color-brand-gold-600: #a38141;
+  --color-brand-paper: #fcfcf9;
+
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  @keyframes marquee-rtl {
+    from { transform: translateX(0); }
+    to { transform: translateX(50%); }
+  }
+}
+
+@layer base {
+  :root {
+    --bg-main: var(--color-brand-paper);
+    --text-main: var(--color-brand-green-900);
+    --text-muted: rgba(4, 47, 46, 0.6);
+    --border-subtle: rgba(197, 160, 89, 0.1);
+    --card-bg: #ffffff;
+  }
+
+  .dark {
+    --bg-main: var(--color-brand-green-950);
+    --text-main: var(--color-brand-paper);
+    --text-muted: rgba(252, 252, 249, 0.6);
+    --border-subtle: rgba(197, 160, 89, 0.2);
+    --card-bg: var(--color-brand-green-900);
+  }
+
+  body {
+    @apply bg-[var(--bg-main)] text-[var(--text-main)] transition-colors duration-300 antialiased;
+    font-feature-settings: "ss01", "ss02", "cv01", "cv02";
+  }
+
+  [dir="rtl"] {
+    @apply font-arabic;
+  }
+}
+
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+}
+
+[dir="rtl"] .animate-marquee {
+  animation: marquee-rtl 30s linear infinite;
+}
+
+
+.gradient-text {
+  @apply bg-clip-text text-transparent bg-linear-to-r from-brand-gold-500 to-brand-gold-600;
+}
+
+.pattern-bg {
+  background-image: radial-gradient(var(--color-brand-gold-500) 0.5px, transparent 0.5px);
+  background-size: 32px 32px;
+  opacity: 0.05;
+}
+
+.dark .pattern-bg {
+  opacity: 0.1;
+}
+
+.glass-nav {
+  @apply backdrop-blur-xl border-b border-[var(--border-subtle)];
+  background-color: color-mix(in srgb, var(--bg-main) 80%, transparent);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Hero Upgrade Styles */
+.hero-makkah-bg {
+  background-image: url('https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?auto=format&fit=crop&q=80&w=2000');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+@media (max-width: 1024px) {
+  .hero-makkah-bg {
+    background-attachment: scroll;
+  }
+}
+
+.hero-overlay {
+  background: linear-gradient(to right, rgb(4, 47, 46, 0.95), rgb(4, 47, 46, 0.8), transparent);
+}
+
+.dark .hero-overlay {
+  background: linear-gradient(to right, rgb(2, 14, 13, 0.95), rgb(2, 14, 13, 0.8), transparent);
+}
+
+.particles-shimmer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.particle {
+  position: absolute;
+  background: var(--color-brand-gold-500);
+  border-radius: 50%;
+  opacity: 0.3;
+  animation: float-up var(--duration) linear infinite;
+  bottom: -20px;
+}
+
+@keyframes float-up {
+  0% { transform: translateY(0) translateX(0); opacity: 0; }
+  20% { opacity: 0.3; }
+  80% { opacity: 0.3; }
+  100% { transform: translateY(-100vh) translateX(var(--drift)); opacity: 0; }
+}
+
+@layer utilities {
+  .fluid-3xl {
+    font-size: clamp(2rem, 5vw, 4.5rem);
+  }
+  .fluid-2xl {
+    font-size: clamp(1.5rem, 4vw, 3.5rem);
+  }
+  .fluid-xl {
+    font-size: clamp(1.25rem, 3vw, 2.5rem);
+  }
+  .snap-x {
+    scroll-snap-type: x mandatory;
+  }
+  .snap-center {
+    scroll-snap-align: center;
+  }
+}
+
+.nav-link-underline {
+  position: relative;
+}
+
+.nav-link-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: var(--color-brand-gold-500);
+  transition: width 0.3s ease;
+}
+
+.nav-link-underline:hover::after {
+  width: 100%;
+}

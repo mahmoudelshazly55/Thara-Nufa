@@ -1,0 +1,115 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ── Enums ──────────────────────────────────────────────────────────────────
+enum BookingStatus {
+  PENDING_REVIEW
+  UNDER_REVIEW
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+// ── Models ─────────────────────────────────────────────────────────────────
+model User {
+  id            String         @id @default(uuid())
+  email         String         @unique
+  passwordHash  String
+  name          String
+  phone         String?
+  address       String?
+  createdAt     DateTime       @default(now())
+  bookings      Booking[]
+  notifications Notification[]
+  reviews       Review[]
+
+  @@map("users")
+}
+
+model Booking {
+  id            String         @id @default(uuid())
+  name          String
+  email         String
+  phone         String
+  serviceType   String
+  date          String
+  address       String         @default("")
+  notes         String         @default("")
+  status        BookingStatus  @default(PENDING_REVIEW)
+  lang          String         @default("ar")
+  userId        String?
+  user          User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
+  notifications Notification[]
+  review        Review?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt(sort: Desc)])
+  @@map("bookings")
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  bookingId String   @unique
+  booking   Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@map("reviews")
+}
+
+model Notification {
+  id        String    @id @default(uuid())
+  userId    String?
+  user      User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bookingId String?
+  booking   Booking?  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  adminOnly Boolean   @default(false)
+  type      String
+  title     String
+  message   String
+  read      Boolean   @default(false)
+  createdAt DateTime  @default(now())
+
+  @@index([userId, read])
+  @@index([adminOnly, read])
+  @@index([bookingId])
+  @@map("notifications")
+}
+
+model Admin {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  createdAt    DateTime @default(now())
+
+  @@map("admins")
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  email     String
+  token     String   @unique
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([email])
+  @@index([token])
+  @@index([expiresAt])
+  @@map("password_reset_tokens")
+}

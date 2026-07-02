@@ -1,0 +1,31 @@
+# Environment secrets — NEVER commit these
+.env
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build outputs
+dist/
+build/
+**/dist/
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+
+# IDE
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Firebase (legacy — not used in this project)
+firebase-blueprint.json
+firestore.rules
+
+# Test coverage
+coverage/
