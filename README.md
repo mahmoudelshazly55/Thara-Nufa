@@ -35,15 +35,6 @@ docker compose down -v
 docker compose build --no-cache
 docker compose up -d
 ```
-
-- **Frontend:** http://localhost:3000
-- **Backend API:** http://localhost:4000/api
-- **Admin Panel:** http://localhost:3000?admin=true
-
-**Admin credentials:**
-- Email: `admin@tharanufa.sa`
-- Password: `TharaNufa@2026`
-
 ## 📡 Real-time System (Socket.io)
 
 Socket.io runs on the same backend port. Events:
