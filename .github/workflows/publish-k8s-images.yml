@@ -7,6 +7,7 @@ on:
     paths:
       - 'backend/**'
       - 'frontend/**'
+      - 'k8s/**'
       - '.github/workflows/publish-k8s-images.yml'
   workflow_dispatch:
 
