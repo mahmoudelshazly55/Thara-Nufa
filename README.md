@@ -1,118 +1,339 @@
-# ثرا نوفا | Thara Nufa Platform
 
-## 🏗️ Architecture Overview
+# THARA NUFA | Service Booking Platform
 
-```
-thara-original/
-├── frontend/          # React 18 + Vite + TailwindCSS v4
+A full-stack service booking platform designed to connect customers with service providers through an organized booking management system, real-time notifications, and an administrative dashboard.
+
+The platform supports user authentication, service booking, booking status tracking, reviews, and administrative operations.
+
+---
+
+## 🚀 Technology Stack
+
+### Frontend
+- React 18
+- TypeScript
+- Vite
+- Tailwind CSS v4
+
+### Backend
+- Node.js
+- Express.js
+- TypeScript
+- Socket.IO
+
+### Database
+- PostgreSQL
+- Prisma ORM
+
+### DevOps & Infrastructure
+- Docker
+- Docker Compose
+- GitHub Actions
+- AWS EC2
+- Nginx
+
+---
+
+## 🏗️ Application Architecture
+
+The application follows a multi-service architecture with separate frontend, backend, and database components.
+
+```text
+THARA-NUFA/
+│
+├── frontend/
 │   └── src/
-│       ├── App.tsx                    # Main app + all pages + modals
-│       ├── constants.ts               # Brand data, services, FAQ, booking stages
+│       ├── App.tsx
+│       ├── constants.ts
 │       ├── components/
-│       │   ├── UserDashboard.tsx      # User portal (bookings, notifications, account)
-│       │   ├── AdminDashboard.tsx     # Admin panel (bookings, users, reviews, notifs)
-│       │   └── ServiceDetail.tsx      # Service detail page
-│       └── index.css                  # Global styles + Tailwind
-├── backend/           # Node.js + Express + Prisma + PostgreSQL
+│       │   ├── UserDashboard.tsx
+│       │   ├── AdminDashboard.tsx
+│       │   └── ServiceDetail.tsx
+│       └── index.css
+│
+├── backend/
 │   └── src/
-│       ├── index.ts                   # Express server + Socket.io
+│       ├── index.ts
 │       ├── routes/
-│       │   ├── users.ts               # Register, login, profile, password, delete
-│       │   ├── bookings.ts            # CRUD + status updates
-│       │   ├── notifications.ts       # User + Admin notifications
-│       │   ├── reviews.ts             # Reviews + admin
-│       │   ├── auth.ts                # Admin auth
-│       │   └── adminUsers.ts          # Admin user management
-│       └── prisma/schema.prisma       # DB schema
+│       │   ├── users.ts
+│       │   ├── bookings.ts
+│       │   ├── notifications.ts
+│       │   ├── reviews.ts
+│       │   ├── auth.ts
+│       │   └── adminUsers.ts
+│       │
+│       └── prisma/
+│           └── schema.prisma
+│
 └── docker-compose.yml
 ```
 
-## 🚀 Quick Start
+---
 
-```bash
-cd thara-original
-docker compose down -v
-docker compose build --no-cache
-docker compose up -d
-```
-## 📡 Real-time System (Socket.io)
+## ⚙️ DevOps Implementation
 
-Socket.io runs on the same backend port. Events:
+### 1. Containerization with Docker
+
+Docker is used to containerize the application services and provide a consistent environment across development and deployment.
+
+Docker Compose manages the multi-container application environment.
+
+Services include:
+
+- Frontend application
+- Backend API
+- PostgreSQL database
+- Nginx web server / reverse proxy
+
+### 2. CI/CD with GitHub Actions
+
+GitHub Actions is used to automate the application workflow.
+
+The CI/CD implementation focuses on:
+
+- Automating application build and verification.
+- Integrating checks into the development workflow.
+- Supporting deployment automation.
+- Improving consistency between application updates.
+
+### 3. AWS Cloud Deployment
+
+AWS EC2 was used as the cloud compute environment for application deployment.
+
+Infrastructure components included:
+
+- Amazon EC2
+- Linux server environment
+- Docker-based application deployment
+- Security Groups
+- Nginx reverse proxy
+
+### 4. Nginx Reverse Proxy
+
+Nginx is used as a reverse proxy to route incoming requests to the appropriate application services.
+
+### 5. Security & Troubleshooting
+
+Security and operational work included:
+
+- Reviewing reported dependency vulnerabilities.
+- Performing security scanning.
+- Addressing identified security issues.
+- Troubleshooting Docker containers and application deployment.
+- Reviewing application configuration and environment variables.
+
+---
+
+## ✨ Main Features
+
+### User Management
+- User registration and login.
+- User profile management.
+- Password management.
+- Account deletion.
+
+### Booking Management
+- Create service bookings.
+- View personal bookings.
+- Administrative booking management.
+- Update booking statuses.
+- Cancel bookings.
+
+### Real-Time Notifications
+
+Socket.IO provides real-time communication between users and administrators.
+
+Supported events:
 
 | Event | Direction | Description |
-|-------|-----------|-------------|
-| `join:user` | Client → Server | User joins their room |
-| `join:admin` | Client → Server | Admin joins admin room |
-| `notification` | Server → User | New notification pushed |
-| `booking:updated` | Server → User | Booking status changed |
+|---|---|---|
+| `join:user` | Client → Server | Join user room |
+| `join:admin` | Client → Server | Join admin room |
+| `notification` | Server → User | New user notification |
+| `booking:updated` | Server → User | Booking status update |
 | `notification:admin` | Server → Admin | New booking/review alert |
 
-## 🔗 Main API Endpoints
-
-### Users
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/users/register` | Register new user |
-| POST | `/api/users/login` | User login |
-| GET | `/api/users/me` | Get current user |
-| PATCH | `/api/users/profile` | Update name/phone |
-| PATCH | `/api/users/password` | Change password |
-| DELETE | `/api/users/account` | Delete own account |
-| PATCH | `/api/users/admin-reset-password/:id` | Admin reset user password |
-
-### Bookings
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/bookings` | Create booking |
-| GET | `/api/bookings` | Get all (admin) |
-| GET | `/api/bookings/user/my-bookings` | Get user bookings |
-| PATCH | `/api/bookings/:id/status` | Update status (admin) |
-| DELETE | `/api/bookings/:id` | Delete booking (admin) |
-
-### Booking Status Flow
-`PENDING_REVIEW` → `UNDER_REVIEW` → `CONFIRMED` → `IN_PROGRESS` → `COMPLETED`
-(or `CANCELLED` at any stage)
-
-### Notifications
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/notifications` | User notifications |
-| PATCH | `/api/notifications/read/:id` | Mark one as read |
-| GET | `/api/notifications/admin` | Admin notifications |
-| PATCH | `/api/notifications/admin/read-all` | Mark all admin notifs read |
-| POST | `/api/notifications/broadcast` | Send to all / specific user |
+### Admin Dashboard
+- Manage bookings.
+- Manage users.
+- Review customer feedback.
+- Monitor notifications.
+- Manage booking statuses.
+- Send broadcast notifications.
+- Access administrative analytics.
 
 ### Reviews
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/reviews` | Submit review (user) |
-| GET | `/api/reviews/admin` | Get all reviews (admin) |
-| DELETE | `/api/reviews/:id` | Delete review (admin) |
+- Customers can submit reviews.
+- Administrators can view and manage reviews.
 
-### Admin Auth
+---
+
+## 🔄 Booking Workflow
+
+The platform supports the following booking lifecycle:
+
+```text
+PENDING_REVIEW
+       |
+       v
+UNDER_REVIEW
+       |
+       v
+CONFIRMED
+       |
+       v
+IN_PROGRESS
+       |
+       v
+COMPLETED
+```
+
+A booking can also be cancelled at any stage.
+
+---
+
+## 🔌 API Endpoints
+
+### Users API
+
 | Method | Endpoint | Description |
-|--------|----------|-------------|
+|---|---|---|
+| POST | `/api/users/register` | Register user |
+| POST | `/api/users/login` | User login |
+| GET | `/api/users/me` | Get current user |
+| PATCH | `/api/users/profile` | Update profile |
+| PATCH | `/api/users/password` | Change password |
+| DELETE | `/api/users/account` | Delete account |
+
+### Bookings API
+
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/api/bookings` | Create booking |
+| GET | `/api/bookings` | Admin: get bookings |
+| GET | `/api/bookings/user/my-bookings` | Get user bookings |
+| PATCH | `/api/bookings/:id/status` | Update booking status |
+| DELETE | `/api/bookings/:id` | Delete booking |
+
+### Notifications API
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/api/notifications` | Get user notifications |
+| PATCH | `/api/notifications/read/:id` | Mark notification as read |
+| GET | `/api/notifications/admin` | Get admin notifications |
+| PATCH | `/api/notifications/admin/read-all` | Mark all admin notifications as read |
+| POST | `/api/notifications/broadcast` | Send broadcast notifications |
+
+### Reviews API
+
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/api/reviews` | Submit review |
+| GET | `/api/reviews/admin` | Get reviews |
+| DELETE | `/api/reviews/:id` | Delete review |
+
+### Admin Authentication
+
+| Method | Endpoint | Description |
+|---|---|---|
 | POST | `/api/auth/login` | Admin login |
 
-## 🎯 User Flows
+---
 
-### Booking Flow
-1. User clicks service → Auth modal if not logged in
-2. Booking form opens (service pre-selected, user data pre-filled)
-3. Submit → Server creates booking → Real-time notification to user + admin
-4. Admin updates status → User gets real-time notification
-5. On COMPLETED → Review modal appears once
+## 🔐 Security
 
-### Admin Flow
-1. Access via `?admin=true` in URL
-2. Login with admin credentials
-3. Manage: bookings, users, notifications, reviews, analytics
-4. Send broadcast notifications to all or specific users
-5. Reset user passwords directly from admin panel
+Security measures implemented in the application include:
 
-## 🔒 Security
-- JWT tokens (30-day expiry) for users and admins
-- bcrypt password hashing (12 rounds)
-- Rate limiting on auth and booking endpoints
-- Admin middleware protection on all admin routes
-- Input validation on all endpoints
+- JWT authentication for users and administrators.
+- bcrypt password hashing.
+- Rate limiting on authentication and booking endpoints.
+- Protected administrative routes.
+- Input validation.
+- Environment-based configuration.
+- Dependency security scanning.
+
+---
+
+## 🐳 Running the Project with Docker Compose
+
+### Prerequisites
+
+Make sure you have installed:
+
+- Docker
+- Docker Compose
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/mahmoudelshazly55/Thara-Nufa.git
+```
+
+### 2. Navigate to the Project Directory
+
+```bash
+cd Thara-Nufa
+```
+
+### 3. Configure Environment Variables
+
+Configure the required environment variables according to the application's configuration and Docker Compose setup.
+
+Do not commit secrets, passwords, API keys, or production credentials to GitHub.
+
+### 4. Build and Start Services
+
+```bash
+docker compose up -d --build
+```
+
+### 5. Check Running Containers
+
+```bash
+docker compose ps
+```
+
+### 6. View Container Logs
+
+```bash
+docker compose logs -f
+```
+
+### 7. Stop Services
+
+```bash
+docker compose down
+```
+
+---
+
+## 🛠️ Skills Demonstrated
+
+This project demonstrates practical experience in:
+
+- Full-Stack Application Architecture
+- Docker Containerization
+- Docker Compose Orchestration
+- CI/CD Automation with GitHub Actions
+- AWS EC2 Deployment
+- Linux Server Administration
+- Nginx Reverse Proxy Configuration
+- PostgreSQL Database Integration
+- Application Troubleshooting
+- Security Scanning and Vulnerability Remediation
+
+---
+
+## 👨‍💻 Project Maintainer
+
+**Mahmoud Elshazly**
+
+Junior DevOps Engineer | Computer Science Background
+
+- GitHub: [@mahmoudelshazly55](https://github.com/mahmoudelshazly55)
+- LinkedIn: [Mahmoud Elshazly](https://www.linkedin.com/in/mahmoud-elshazly-20320127a/)
+
+---
+
+**THARA NUFA — Full-Stack Development & DevOps Deployment**
